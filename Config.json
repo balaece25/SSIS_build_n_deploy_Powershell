@@ -1,0 +1,16 @@
+{
+    "configuration": {
+        "env" : {
+            "sit": {
+                "SSISDBServerEndpoint" : "sqlserver",
+                "SSISDBServerAdminUserName" : "sa",
+                "SSISDBServerAdminPassword" : "pass"
+            },
+            "uat": {
+                "SSISDBServerEndpoint" : "uatSQL",
+                "SSISDBServerAdminUserName" : "uatUSER",
+                "SSISDBServerAdminPassword" : ""
+            }
+        }
+    }
+}
