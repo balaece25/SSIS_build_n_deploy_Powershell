@@ -85,6 +85,9 @@ Write-Host "Integration Services object set:" $integrationServices
 $catalog = $integrationServices.Catalogs['SSISDB']
 Write-Host "The catalog is:" $catalog
 
+############################
+########## FOLDER ##########
+############################
 $ssisFolder = $catalog.Folders.Item($SSISFolderName)
 Write-Host "SSIS Folder is:" $ssisFolder
 
@@ -96,9 +99,21 @@ if (!$ssisFolder)
 	write-host "New folder on catalog:" $folder
     $folder.Create()
     $ssisFolder = $catalog.Folders.Item($SSISFolderName)
-	write-host "Newly created SSIS folder:" $ssisFolder
+    write-host "Newly created SSIS folder:" $ssisFolder
 }
 
+#################################
+########## ENVIRONMENT ##########
+#################################
+# Create object for the (new) environment
+$Environment = $ssisFolder.Environments[$EnvType]
+if (!$Environment)
+{
+    Write-Host "Creating environment" $EnvType "in" $SSISFolderName
+    $Environment = New-Object Microsoft.SqlServer.Management.IntegrationServices.EnvironmentInfo($ssisFolder, $EnvType, $EnvType)
+    $Environment.Create()
+    Write-Host "Environment Created"
+}
 write-host "Enumerating all folders in the project code"
 
 $folders = ls -Path $ProjectFilePath -File
