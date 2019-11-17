@@ -142,6 +142,18 @@ if ($folders.Count -gt 0)
     }
 }
 
+###############   SCRIPT to run a SQL Script ####################
+
+# $command = new-object system.data.sqlclient.sqlcommand($sqlCommand,$connection)
+# $connection.Open()
+
+# $adapter = New-Object System.Data.sqlclient.sqlDataAdapter $command
+# $dataset = New-Object System.Data.DataSet
+# $adapter.Fill($dataSet) | Out-Null
+
+# $connection.Close()
+# $dataSet.Tables
+
 Write-Host "All done."
 
 Set-Location -Path $MyWorkSpace
@@ -159,15 +171,3 @@ Set-Location -Path $MyWorkSpace
 # }
 
 # $folder.Drop()
-
-###############   SCRIPT to run a SQL Script ####################
-
-# $command = new-object system.data.sqlclient.sqlcommand($sqlCommand,$connection)
-# $connection.Open()
-
-# $adapter = New-Object System.Data.sqlclient.sqlDataAdapter $command
-# $dataset = New-Object System.Data.DataSet
-# $adapter.Fill($dataSet) | Out-Null
-
-# $connection.Close()
-# $dataSet.Tables
