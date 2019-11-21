@@ -1,5 +1,7 @@
 Thanks to Joost van Rossum for his [Wonderful Article](https://microsoft-ssis.blogspot.com/2015/08/deploying-environments-and-variables_8.html)
 
+SSIS Drop & Re-Deploy if Project Exists - Thanks to Snehadeep for the [Wonderful Article](https://blogs.msdn.microsoft.com/dataaccesstechnologies/2013/10/07/ssis-2012-automation-part-1-deploy-ssis-project-to-ssis-catalog/)
+
 Azure Devops SSIS Projects from Same Author [here](https://microsoft-ssis.blogspot.com/)
 ##
 Run this File
