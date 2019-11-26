@@ -15,18 +15,27 @@ param(
     [string]$GitBranch="master"
 )
 
+$MyWorkSpace = (Get-Location).Path
 $GitFolder = $GitURL.split("/")[$GitURL.split("/").length -1]
-$MyWorkSpace = $PSScriptRoot
 
 Write-Host "**********************************************************"
 Write-Host ("Project - ",$ProjectFolderName, "`nEnv - ",$EnvType, "`nGit Branch - ",$GitBranch) -ForegroundColor Green
 Write-Host "**********************************************************"
 
+# condition to pull & clone
+if(-not (Test-Path -LiteralPath $GitFolder)){
+	Write-Host "Cloning GIT URL $GitURL ......"
+	git clone $GitURL
+} else {
+	Write-Host "Project Folder already exists."
+	Write-Host "Fetching updates from remote git repo ......"
+	Set-Location $GitFolder
+	git pull
+	Write-Host "local project up-to-date with remote git repo ......"
+}
+
 # fetch details from config file
 $configFile = Get-Content -Raw -Path .\Config.json | ConvertFrom-Json
-
-# condition to pull & clone
-#git clone $GitURL
 
 Set-Location $GitFolder
 
@@ -156,7 +165,9 @@ if(!$ssisFolder.Projects.Item($ssisProjectName))
     $ssisFolder.DeployProject($ssisProjectName,[System.IO.File]::ReadAllBytes($ProjectFilePath))
 }
 
-cd..
+#cd..
+Set-Location $MyWorkSpace
+
 Write-Host "All done." -ForegroundColor Green
 <#
 write-host "Enumerating all folders in the project code"
