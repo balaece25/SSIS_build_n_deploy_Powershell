@@ -96,7 +96,7 @@ $integrationServices = New-Object $ISNamespace".IntegrationServices" $sqlConnect
 Write-Host "Integration Services object set:" $integrationServices -ForegroundColor Green
 
 # Get the catalog
-$catalog = $integrationServices.Catalogs['SSISDB']
+$catalog = $integrationServices.Catalogs["SSISDB"]
 Write-Host "The catalog is:" $catalog
 
 ############################
@@ -136,7 +136,7 @@ $ssisProjectName = $ProjectFileName.Replace(".ispac", "")
 
 if($ssisFolder.Projects.Item($ssisProjectName))
 {
-    Write-Host "Project with the name $ssisProjectName already exists. Would you like to drop it and deploy again 'y or n' (Default is n) - " -ForegroundColor DarkYellow
+    Write-Host "Project with the name $ssisProjectName already exists. Would you like to drop it and deploy again y or n (Default is n) - " -ForegroundColor DarkYellow
     $usrResponse = Read-Host " (y / n ) "
     Switch ($usrResponse)
     {
