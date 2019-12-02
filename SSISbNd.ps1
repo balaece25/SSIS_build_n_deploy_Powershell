@@ -5,17 +5,21 @@
 # git checkout branchname
 
 param(
-    # [Parameter(Mandatory=$True, Position=0, ValueFromPipeline=$false)]
-    [string]$GitURL="https://user:token@dev.azure.com/proj/test/_git/test",
-    # [Parameter(Mandatory=$True, Position=1, ValueFromPipeline=$false)]
+    [Parameter(Mandatory=$True, Position=0, ValueFromPipeline=$false)]
+    [string]$GitURL,
+    [Parameter(Mandatory=$True, Position=1, ValueFromPipeline=$false)]
     [string]$ProjectFolderName,
-    # [Parameter(Mandatory=$True, Position=2, ValueFromPipeline=$false)]
+    [Parameter(Mandatory=$True, Position=2, ValueFromPipeline=$false)]
     [string]$EnvType,
-    # [Parameter(Mandatory=$True, Position=2, ValueFromPipeline=$false)]
+    [Parameter(Mandatory=$True, Position=2, ValueFromPipeline=$false)]
     [string]$GitBranch
 )
 
 $MyWorkSpace = (Get-Location).Path
+
+# fetch details from config file
+$configFile = Get-Content -Raw -Path .\Config.json | ConvertFrom-Json
+
 $GitFolder = $GitURL.split("/")[$GitURL.split("/").length -1]
 
 Write-Host "**********************************************************"
@@ -33,9 +37,6 @@ if(-not (Test-Path -LiteralPath $GitFolder)){
 	git pull
 	Write-Host "local project up-to-date with remote git repo ......"
 }
-
-# fetch details from config file
-$configFile = Get-Content -Raw -Path .\Config.json | ConvertFrom-Json
 
 Set-Location $GitFolder
 
