@@ -8,11 +8,11 @@ param(
     # [Parameter(Mandatory=$True, Position=0, ValueFromPipeline=$false)]
     [string]$GitURL="https://user:token@dev.azure.com/proj/test/_git/test",
     # [Parameter(Mandatory=$True, Position=1, ValueFromPipeline=$false)]
-    [string]$ProjectFolderName="life",
+    [string]$ProjectFolderName,
     # [Parameter(Mandatory=$True, Position=2, ValueFromPipeline=$false)]
-    [string]$EnvType="sit",
+    [string]$EnvType,
     # [Parameter(Mandatory=$True, Position=2, ValueFromPipeline=$false)]
-    [string]$GitBranch="master"
+    [string]$GitBranch
 )
 
 $MyWorkSpace = (Get-Location).Path
@@ -54,6 +54,7 @@ $SSISProjETLdtproj = "$SSISProjETL\ETL.dtproj"
 Write-Host ".dtproj file ==> $SSISProjETLdtproj" -ForegroundColor Green
 
 & "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\devenv.com" $SSISProjETLdtproj  /Rebuild
+#& "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\Common7\IDE\devenv.com" $SSISProjETLdtproj  /Rebuild
 
 $ispacFile = Get-ChildItem "$SSISProjETL\bin\Development" -Filter "*.ispac"
 $ProjectFilePath = $ispacFile.FullName
