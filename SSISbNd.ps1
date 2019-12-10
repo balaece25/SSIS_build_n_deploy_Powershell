@@ -14,6 +14,10 @@ param(
     [Parameter(Mandatory=$True, Position=2, ValueFromPipeline=$false)]
     [string]$GitBranch
 )
+# Timestamp while saving logs
+function Get-TimeStamp {
+    return "[{0:dd/MM/yy} {0:HH:mm:ss}]" -f (Get-Date)
+}
 
 $MyWorkSpace = (Get-Location).Path
 
@@ -22,29 +26,29 @@ $configFile = Get-Content -Raw -Path .\Config.json | ConvertFrom-Json
 
 $GitFolder = $GitURL.split("/")[$GitURL.split("/").length -1]
 
-Write-Host "**********************************************************"
+Write-Host "************************* $(Get-TimeStamp) *********************************"
 Write-Host ("Project - ",$ProjectFolderName, "`nEnv - ",$EnvType, "`nGit Branch - ",$GitBranch) -ForegroundColor Green
 Write-Host "**********************************************************"
 
 # condition to pull & clone
 if(-not (Test-Path -LiteralPath $GitFolder)){
-	Write-Host "Cloning GIT URL $GitURL ......"
+ 	Write-Host "$(Get-TimeStamp) Cloning GIT URL $GitURL ......"
 	git clone $GitURL
 } else {
-	Write-Host "Project Folder already exists."
-	Write-Host "Fetching updates from remote git repo ......"
+	Write-Host "$(Get-TimeStamp) Project Folder already exists."
+	Write-Host "$(Get-TimeStamp) Fetching updates from remote git repo ......"
 	Set-Location $GitFolder
 	git pull
-	Write-Host "local project up-to-date with remote git repo ......"
+	Write-Host "$(Get-TimeStamp) local project up-to-date with remote git repo ......"
 }
 
 Set-Location $GitFolder
 
-Write-Host "Changed Directory to Git Folder $GitFolder" -ForegroundColor Green
+Write-Host "$(Get-TimeStamp) Changed Directory to Git Folder $GitFolder" -ForegroundColor Green
 
 git checkout $GitBranch.
 
-Write-Host "Git checked to branch $GitBranch" -ForegroundColor Green
+Write-Host "$(Get-TimeStamp) Git checked to branch $GitBranch" -ForegroundColor Green
 
 $SSISProjFolder = Get-ChildItem "$MyWorkSpace\$GitFolder\source" -Filter "*$ProjectFolderName*" -Directory
 $SSISProjName = $SSISProjFolder.FullName
@@ -52,7 +56,7 @@ $SSISDBProjName = $SSISProjFolder.Name
 $SSISProjETL = "$SSISProjName\ETL"
 $SSISProjETLdtproj = "$SSISProjETL\ETL.dtproj"
 
-Write-Host ".dtproj file ==> $SSISProjETLdtproj" -ForegroundColor Green
+Write-Host "$(Get-TimeStamp) .dtproj file ==> $SSISProjETLdtproj" -ForegroundColor Green
 
 & "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\devenv.com" $SSISProjETLdtproj  /Rebuild
 #& "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\Common7\IDE\devenv.com" $SSISProjETLdtproj  /Rebuild
@@ -60,7 +64,7 @@ Write-Host ".dtproj file ==> $SSISProjETLdtproj" -ForegroundColor Green
 $ispacFile = Get-ChildItem "$SSISProjETL\bin\Development" -Filter "*.ispac"
 $ProjectFilePath = $ispacFile.FullName
 $ProjectFileName = $ispacFile.Name
-Write-Host ".ispac file ==> $ProjectFileName $ProjectFilePath" -ForegroundColor Green
+Write-Host "$(Get-TimeStamp) .ispac file ==> $ProjectFileName $ProjectFilePath" -ForegroundColor Green
 
 $SSISDBServerEndpoint = $configFile.configuration.env.$EnvType.SSISDBServerEndpoint
 $SSISDBServerAdminUserName = $configFile.configuration.env.$EnvType.SSISDBServerAdminUserName
@@ -68,8 +72,8 @@ $SSISDBServerAdminPassword = $configFile.configuration.env.$EnvType.SSISDBServer
 $SSISDBAuthType = $configFile.configuration.env.$EnvType.SSISDBAuthType
 $SSISFolderName = $SSISDBProjName
 $SSISDescription = $SSISDBProjName
-Write-Host "SQL server  ==> $SSISDBServerEndpoint" -ForegroundColor Green
-Write-Host "SQL server Authentication Type  ==> $SSISDBAuthType" -ForegroundColor Green
+Write-Host "$(Get-TimeStamp) SQL server  ==> $SSISDBServerEndpoint" -ForegroundColor Green
+Write-Host "$(Get-TimeStamp) SQL server Authentication Type  ==> $SSISDBAuthType" -ForegroundColor Green
 Write-Host "**********************************************************"
 Write-Host "********  Integration Services Assembly starts  **********"
 Write-Host "**********************************************************"
@@ -80,7 +84,7 @@ Write-Host "**********************************************************"
 # Store the IntegrationServices Assembly namespace to avoid typing it every time
 $ISNamespace = "Microsoft.SqlServer.Management.IntegrationServices"
 
-Write-Host "Connecting to SSIS Server Instance ..." -ForegroundColor Green
+Write-Host "$(Get-TimeStamp) Connecting to SSIS Server Instance ..." -ForegroundColor Green
 
 # Create a connectionstring to the server windows authentication or sql server authentication
 if ($SSISDBAuthType = "windows") {
@@ -90,22 +94,22 @@ if ($SSISDBAuthType = "windows") {
 }
 $sqlConnection = New-Object System.Data.SqlClient.SqlConnection $sqlConnectionString
 
-Write-Host "slq connection set:" $sqlConnection
+Write-Host "$(Get-TimeStamp) slq connection set:" $sqlConnection
 
 # Create the Integration Services object
 $integrationServices = New-Object $ISNamespace".IntegrationServices" $sqlConnection
 
-Write-Host "Integration Services object set:" $integrationServices -ForegroundColor Green
+Write-Host "$(Get-TimeStamp) Integration Services object set:" $integrationServices -ForegroundColor Green
 
 # Get the catalog
 $catalog = $integrationServices.Catalogs["SSISDB"]
-Write-Host "The catalog is:" $catalog
+Write-Host "$(Get-TimeStamp) The catalog is:" $catalog
 
 ############################
 ########## FOLDER ##########
 ############################
 $ssisFolder = $catalog.Folders.Item($SSISFolderName)
-Write-Host "SSIS Folder is:" $ssisFolder -ForegroundColor Green
+Write-Host "$(Get-TimeStamp) SSIS Folder is:" $ssisFolder -ForegroundColor Green
 
 # Verify if we have already this folder
 if (!$ssisFolder)
@@ -125,20 +129,20 @@ if (!$ssisFolder)
 $Environment = $ssisFolder.Environments[$EnvType]
 if (!$Environment)
 {
-    Write-Host "Creating environment" $EnvType "in" $SSISFolderName -ForegroundColor Green
+    Write-Host "$(Get-TimeStamp) Creating environment" $EnvType "in" $SSISFolderName -ForegroundColor Green
     $Environment = New-Object Microsoft.SqlServer.Management.IntegrationServices.EnvironmentInfo($ssisFolder, $EnvType, $EnvType)
     $Environment.Create()
-    Write-Host "Environment Created"
+    Write-Host "$(Get-TimeStamp) Environment Created"
 }
 
 #Check if project is already deployed or not, if deployed deop it and deploy again
-Write-Host "Checking if project is already deployed or not, if deployed drop it and deploy again" -ForegroundColor Green
+Write-Host "$(Get-TimeStamp) Checking if project is already deployed or not, if deployed drop it and deploy again" -ForegroundColor Green
 
 $ssisProjectName = $ProjectFileName.Replace(".ispac", "")
 
 if($ssisFolder.Projects.Item($ssisProjectName))
 {
-    Write-Host "Project with the name $ssisProjectName already exists. Would you like to drop it and deploy again y or n (Default is n) - " -ForegroundColor DarkYellow
+    Write-Host "$(Get-TimeStamp) Project with the name $ssisProjectName already exists. Would you like to drop it and deploy again y or n (Default is n) - " -ForegroundColor DarkYellow
     $usrResponse = Read-Host " (y / n ) "
     Switch ($usrResponse)
     {
@@ -146,15 +150,15 @@ if($ssisFolder.Projects.Item($ssisProjectName))
             Write-host "Yes, Drop & Re-Deploy" -ForegroundColor Green
             $ssisFolder.Projects.Item($ssisProjectName).Drop()
 
-            Write-Host "Re-Deploying " $ProjectFileName " project in $ssisFolder..."
+            Write-Host "$(Get-TimeStamp) Re-Deploying " $ProjectFileName " project in $ssisFolder..."
             #Read the project file, and deploy it to the folder
             $ssisFolder.DeployProject($ssisProjectName,[System.IO.File]::ReadAllBytes($ProjectFilePath))
         }
         n {
-            Write-Host "No, Skip Drop" -ForegroundColor Green
+            Write-Host "$(Get-TimeStamp) No, Skip Drop" -ForegroundColor Green
         }
         Default {
-            Write-Host "Default, Skip Drop" -ForegroundColor Green
+            Write-Host "$(Get-TimeStamp) Default, Skip Drop" -ForegroundColor Green
         }
     }
 
@@ -162,7 +166,7 @@ if($ssisFolder.Projects.Item($ssisProjectName))
 
 if(!$ssisFolder.Projects.Item($ssisProjectName))
 {
-    Write-Host "Deploying " $ProjectFileName " project ..."
+    Write-Host "$(Get-TimeStamp) Deploying " $ProjectFileName " project ..."
     #Read the project file, and deploy it to the folder
     $ssisFolder.DeployProject($ssisProjectName,[System.IO.File]::ReadAllBytes($ProjectFilePath))
 }
@@ -170,7 +174,7 @@ if(!$ssisFolder.Projects.Item($ssisProjectName))
 #cd..
 Set-Location $MyWorkSpace
 
-Write-Host "All done." -ForegroundColor Green
+Write-Host "$(Get-TimeStamp) All done." -ForegroundColor Green
 <#
 write-host "Enumerating all folders in the project code"
 
@@ -204,7 +208,7 @@ if ($folders.Count -gt 0)
                     $ssisProject.Drop()
                 }
 
-                Write-Host "Deploying " $projectfilename " project ..."
+                Write-Host "$(Get-TimeStamp) Deploying " $projectfilename " project ..."
 
                 # Read the project file, and deploy it to the folder
                 [byte[]] $projectFileContent = [System.IO.File]::ReadAllBytes($projectfile.FullName)
@@ -227,7 +231,7 @@ if ($folders.Count -gt 0)
 # $connection.Close()
 # $dataSet.Tables
 
-Write-Host "All done."
+Write-Host "$(Get-TimeStamp) All done."
 
 Set-Location -Path $MyWorkSpace
 
@@ -245,3 +249,4 @@ Set-Location -Path $MyWorkSpace
 
 # $folder.Drop()
 #>
+Write-Host "#---------------------------------------------------------------------#"
