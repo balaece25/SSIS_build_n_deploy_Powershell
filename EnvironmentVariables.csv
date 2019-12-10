@@ -1,0 +1,13 @@
+Datatype;Parameter Name;Parameter Value;Parameter Description;Sensitive (true or false)
+String;MIS_STG_ConnectionString;"Data Source=.\sql2016;Initial Catalog=MIS_STG;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;";Connectionstring to stage database;false
+String;MIS_HST_ConnectionString;"Data Source=.\sql2016;Initial Catalog=MIS_HST;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;";Connectionstring to historical stage database;false
+String;MIS_DWH_ConnectionString;"Data Source=.\sql2016;Initial Catalog=MIS_DWH;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;";Connectionstring to data warehouse database;false
+String;MIS_MTA_ConnectionString;"Data Source=.\sql2016;Initial Catalog=MIS_MTA;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;";Connectionstring to metadata database;false
+String;MIS_DM_ConnectionString;"Data Source=.\sql2016;Initial Catalog=MIS_DM;Provider=SQLNCLI11.1;Integrated Security=SSPI;Auto Translate=False;";Connectionstring to data mart database;false
+String;FtpPassword; 53cr3t!;Secret FTP password;true
+String;FtpUser;SSISJoost;Username for FTP;false
+String;FtpServer;ftp://SSISJoost.nl;FTP Server;false
+String;FolderStageFiles;d:\sources\;Location of stage files;false
+Boolean;EnableRetry; true;Enable retry for Webservice Task;false
+Int16;NumberOfRetries;3;Number of retries for Webservice Task;false
+Int16;SecsPauseBetweenRetry;30;Number of seconds between retry;false
