@@ -6,10 +6,9 @@ param(
     [Parameter(Mandatory=$True, Position=2, ValueFromPipeline=$false)]
     [string]$EnvType,
     [Parameter(Mandatory=$True, Position=2, ValueFromPipeline=$false)]
-    [string]$GitBranch,
-    [boolean] $show = 0
+    [string]$GitBranch
 )
-"-- show $show"
+
 # Timestamp while saving logs
 function Get-TimeStamp {
     return "[{0:dd/MM/yy} {0:HH:mm:ss}]" -f (Get-Date)
@@ -19,10 +18,6 @@ $MyWorkSpace = (Get-Location).Path
 
 # Path of CSV containing environment variables
 $FilepathCsv = "$PSScriptRoot\EnvironmentVariables.csv"
-
-# Path of CSV containing project variables
-$FilepathCsv = "$PSScriptRoot\ProjectVariables.csv"
-
 
 # fetch details from config file
 $configFile = Get-Content -Raw -Path .\Config.json | ConvertFrom-Json
@@ -58,8 +53,8 @@ $SSISProjETLdtproj = "$SSISProjETL\ETL.dtproj"
 
 Write-Host "$(Get-TimeStamp) .dtproj file ==> $SSISProjETLdtproj" -ForegroundColor Green
 
-& "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\devenv.com" $SSISProjETLdtproj  /Rebuild
-#& "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\Common7\IDE\devenv.com" $SSISProjETLdtproj  /Rebuild
+#& "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\devenv.com" $SSISProjETLdtproj  /Rebuild
+& "C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\Common7\IDE\devenv.com" $SSISProjETLdtproj  /Rebuild
 
 $ispacFile = Get-ChildItem "$SSISProjETL\bin\Development" -Filter "*.ispac"
 $ProjectFilePath = $ispacFile.FullName
